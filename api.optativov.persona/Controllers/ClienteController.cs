@@ -8,28 +8,28 @@ namespace api.optativov.persona.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class PersonaController : Controller
+    public class ClienteController : Controller
     {
         private IConfiguration configuration;
-        private PersonaService personaService;
+        private ClienteService clienteService;
 
         /*public CuentaController()*/
-        public PersonaController(IConfiguration configuration)
+        public ClienteController(IConfiguration configuration)
         {
             this.configuration = configuration;
-            this.personaService = new PersonaService(new PersonaRepository(configuration.GetConnectionString("postgresDB")));
+            this.clienteService = new ClienteService(new ClienteRepository(configuration.GetConnectionString("postgresDB")));
         }
         // Generate crud controller
         [HttpPost]
         [Route("add")]
-        public IActionResult add(PersonaDTO persona)
+        public IActionResult add(ClienteDTO cliente)
         {
             try
             {
-                if (personaService.add(persona))
-                    return Ok("Persona agregada correctamente");
+                if (clienteService.add(cliente))
+                    return Ok("Cliente agregada correctamente");
                 else
-                    return BadRequest("Error al agregar persona");
+                    return BadRequest("Error al agregar cliente");
             }
             catch (Exception ex)
             {
@@ -37,15 +37,15 @@ namespace api.optativov.persona.Controllers
             }
         }
         [HttpPut]
-        [Route("update/{id}")]
-        public IActionResult update(PersonaDTO persona)
+        [Route("update")]
+        public IActionResult update(ClienteDTO cliente)
         {
             try
             {
-                if (personaService.update(persona))
-                    return Ok("Persona actualizada correctamente");
+                if (clienteService.update(cliente))
+                    return Ok("Cliente actualizada correctamente");
                 else
-                    return BadRequest("Error al actualizar persona");
+                    return BadRequest("Error al actualizar cliente");
             }
             catch (Exception ex)
             {
@@ -54,14 +54,14 @@ namespace api.optativov.persona.Controllers
         }
         [HttpDelete]
         [Route("remove")]
-        public IActionResult remove(string cedula)
+        public IActionResult remove(int id)
         {
             try
             {
-                if (personaService.remove(cedula))
-                    return Ok("Persona eliminada correctamente");
+                if (clienteService.remove(id))
+                    return Ok("Cliente eliminada correctamente");
                 else
-                    return BadRequest("Error al eliminar persona");
+                    return BadRequest("Error al eliminar cliente");
             }
             catch (Exception ex)
             {
@@ -70,15 +70,15 @@ namespace api.optativov.persona.Controllers
         }
         [HttpGet]
         [Route("get/{id}")]
-        public IActionResult get(string id)
+        public IActionResult get(int id)
         {
             try
             {
-                var persona = personaService.get(id);
-                if (persona != null)
-                    return Ok(persona);
+                var cliente = clienteService.get(id);
+                if (cliente != null)
+                    return Ok(cliente);
                 else
-                    return BadRequest("Persona no encontrada");
+                    return BadRequest("Cliente no encontrada");
             }
             catch (Exception ex)
             {
@@ -91,17 +91,16 @@ namespace api.optativov.persona.Controllers
         {
             try
             {
-                var personas = personaService.list();
-                if (personas != null)
-                    return Ok(personas);
+                var clientes = clienteService.list();
+                if (clientes != null)
+                    return Ok(clientes);
                 else
-                    return BadRequest("No hay personas registradas");
+                    return BadRequest("No hay clientes registradas");
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-
     }
 }
