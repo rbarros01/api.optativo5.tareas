@@ -1,5 +1,7 @@
 ﻿using Dapper;
 using Repository.Database;
+using Repository.Interfaces;
+using Repository.Modelos;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository
+namespace Repository.Implementations
 {
     public class PersonaRepository : IPersonaRepository
     {
@@ -64,7 +66,7 @@ namespace Repository
 
             try
             {
-                if (conexionDB.Execute("Delete from Persona where cedula = @cedula", new { cedula } ) > 0)
+                if (conexionDB.Execute("Delete from Persona where cedula = @cedula", new { cedula }) > 0)
                     return true;
                 else
                     return false;
