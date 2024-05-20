@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Repository.Modelos
 {
@@ -6,6 +7,7 @@ namespace Repository.Modelos
     {
         public int Id { get; set; }
         public int IdCliente { get; set; }
+
         [Required(ErrorMessage = "El número de factura es obligatorio.")]
         [RegularExpression("^[0-9]{12}$", ErrorMessage = "El número de factura debe ser numérico y contener 12 dígitos.")]
         public string NroFactura { get; set; }
@@ -16,5 +18,6 @@ namespace Repository.Modelos
         public decimal TotalIva { get; set; }
         public string TotalLetras { get; set; }
         public string Sucursal { get; set; }
+
     }
 }
