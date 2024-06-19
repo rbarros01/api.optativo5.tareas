@@ -1,19 +1,12 @@
 ﻿using Repository.Interfaces;
 using Repository.Modelos;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 
 namespace Services
 {
-    public class ClienteService
+    public class ClienteService(IClienteRepository clienteRepository)
     {
-        private readonly IClienteRepository _clienteRepository;
-
-        public ClienteService(IClienteRepository clienteRepository)
-        {
-            _clienteRepository = clienteRepository;
-        }
+        private readonly IClienteRepository _clienteRepository = clienteRepository;
 
         public async Task<bool> Add(ClienteDTO cliente)
         {

@@ -1,32 +1,35 @@
-﻿using Repository.Database;
-using Repository.Interfaces;
+﻿using Repository.Interfaces;
 using Repository.Modelos;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Repository.Enums;
+
 
 namespace Repository.Implementations
 {
-    public class ClienteRepository : IClienteRepository
+    public class ClienteRepository(ApplicationDbContext context) : IClienteRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public ClienteRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<bool> Add(ClienteDTO cliente)
         {
             try
             {
-                await _context.ClientesEF.AddAsync(cliente);
-                return await _context.SaveChangesAsync() > 0;
+                var existeCliente = await _context.ClientesEF.AsNoTracking()
+                                                             .Where(e => e.Documento.Equals(cliente.Documento) && e.Estado.Equals(GenericoConstante.EstadoActivo))
+                                                             .AnyAsync();
+
+                if (!existeCliente)
+                {
+                    cliente.Estado = GenericoConstante.EstadoActivo;
+                    await _context.ClientesEF.AddAsync(cliente);
+                    return await _context.SaveChangesAsync() > 0;
+                }
+                else
+                    return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -34,11 +37,11 @@ namespace Repository.Implementations
         {
             try
             {
-                return await _context.ClientesEF.FirstOrDefaultAsync(c => c.Id == id);
+                return await _context.ClientesEF.FirstOrDefaultAsync(c => c.Id == id && c.Estado == GenericoConstante.EstadoActivo);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -46,11 +49,13 @@ namespace Repository.Implementations
         {
             try
             {
-                return await _context.ClientesEF.Where(c => c.Estado != "inactivo").ToListAsync();
+                return await _context.ClientesEF
+                    .Where(c => c.Estado.Equals(GenericoConstante.EstadoActivo))
+                    .ToListAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -59,17 +64,17 @@ namespace Repository.Implementations
             try
             {
                 var cliente = await _context.ClientesEF.FindAsync(id);
-                if (cliente != null)
+                if (cliente is not null)
                 {
-                    cliente.Estado = "inactivo";
+                    cliente.Estado = GenericoConstante.EstadoInactivo;
                     _context.ClientesEF.Update(cliente);
                     return await _context.SaveChangesAsync() > 0;
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -77,12 +82,24 @@ namespace Repository.Implementations
         {
             try
             {
-                _context.ClientesEF.Update(cliente);
-                return await _context.SaveChangesAsync() > 0;
+                var existeDocumento = await _context.ClientesEF.AsNoTracking()
+                                                    .Where(e => e.Documento.Equals(cliente.Documento) && e.Estado.Equals(GenericoConstante.EstadoActivo))
+                                                    .AnyAsync();
+
+                var existeCliente = await _context.ClientesEF.AsNoTracking()
+                                                            .Where(e => e.Id.Equals(cliente.Id) && e.Estado.Equals(GenericoConstante.EstadoActivo))
+                                                            .AnyAsync();
+                if (!existeDocumento && existeCliente)
+                {
+                    _context.ClientesEF.Update(cliente);
+                    return await _context.SaveChangesAsync() > 0;
+                }
+                else
+                    return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
     }

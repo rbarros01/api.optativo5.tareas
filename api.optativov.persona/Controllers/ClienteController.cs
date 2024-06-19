@@ -8,53 +8,55 @@ namespace api.optativov.persona.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClienteController : ControllerBase
+    public class ClienteController(IConfiguration configuration, ClienteService clienteService) : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly ClienteService _clienteService;
-
-        public ClienteController(IConfiguration configuration, ClienteService clienteService)
-        {
-            _configuration = configuration;
-            _clienteService = clienteService;
-        }
+        private readonly IConfiguration _configuration = configuration;
+        private readonly ClienteService _clienteService = clienteService;
 
         [HttpPost]
-        [Route("add")]
+        [Route("AgregarCliente")]
         public async Task<IActionResult> Add(ClienteDTO cliente)
         {
             try
             {
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 if (await _clienteService.Add(cliente))
                     return Ok("Cliente agregado correctamente");
                 else
-                    return BadRequest("Error al agregar cliente");
+                    return BadRequest($"Cliente con CI {cliente.Documento} ya existe");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Error al agregar cliente");
             }
         }
 
         [HttpPut]
-        [Route("update")]
+        [Route("ActualizarCliente")]
         public async Task<IActionResult> Update(ClienteDTO cliente)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 if (await _clienteService.Update(cliente))
                     return Ok("Cliente actualizado correctamente");
                 else
-                    return BadRequest("Error al actualizar cliente");
+                    return BadRequest($"Cliente con id {cliente.Id} no existe o el numero de documento ya esta en uso");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(("Error al actualizar cliente"));
             }
         }
 
         [HttpDelete]
-        [Route("remove/{id}")]
+        [Route("EliminarCliente/{id}")]
         public async Task<IActionResult> Remove(int id)
         {
             try
@@ -71,7 +73,7 @@ namespace api.optativov.persona.Controllers
         }
 
         [HttpGet]
-        [Route("get/{id}")]
+        [Route("ObtenerCliente/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -89,7 +91,7 @@ namespace api.optativov.persona.Controllers
         }
 
         [HttpGet]
-        [Route("list")]
+        [Route("ListarCliente")]
         public async Task<IActionResult> List()
         {
             try
