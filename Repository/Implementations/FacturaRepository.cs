@@ -1,28 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 using Repository.Modelos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Repository.Implementations
 {
-    public class FacturaRepository : IFacturaRepository
+    public class FacturaRepository(ApplicationDbContext context) : IFacturaRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public FacturaRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<bool> Add(FacturaDTO factura)
         {
             try
             {
-                await _context.FacturasEF.AddAsync(factura);
-                return await _context.SaveChangesAsync() > 0;
+                var existeCliente = await _context.ClientesEF.AsNoTracking()
+                                                             .Where(e => e.Id == factura.IdCliente)
+                                                             .AnyAsync();
+                if (existeCliente)
+                {
+                    await _context.FacturasEF.AddAsync(factura);
+                    return await _context.SaveChangesAsync() > 0;
+                }
+                else
+                    return false;
+
             }
             catch (Exception ex)
             {
@@ -59,7 +59,7 @@ namespace Repository.Implementations
             try
             {
                 var factura = await _context.FacturasEF.FindAsync(id);
-                if (factura != null)
+                if (factura is not null)
                 {
                     _context.FacturasEF.Remove(factura);
                     return await _context.SaveChangesAsync() > 0;
@@ -76,8 +76,20 @@ namespace Repository.Implementations
         {
             try
             {
-                _context.FacturasEF.Update(factura);
-                return await _context.SaveChangesAsync() > 0;
+                var existeCliente = await _context.ClientesEF.AsNoTracking()
+                                                             .Where(e => e.Id == factura.IdCliente)
+                                                             .AnyAsync();
+
+                var existeFactura = await _context.FacturasEF.AsNoTracking()
+                                                             .Where(e => e.Id.Equals(factura.Id))
+                                                             .AnyAsync();
+                if (existeCliente && existeFactura)
+                {
+                    _context.FacturasEF.Update(factura);
+                    return await _context.SaveChangesAsync() > 0;
+                }
+                else
+                    return false;
             }
             catch (Exception ex)
             {

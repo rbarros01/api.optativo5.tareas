@@ -8,42 +8,45 @@ namespace api.optativov.persona.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class FacturaController : ControllerBase
+    public class FacturaController(FacturaService facturaService) : ControllerBase
     {
-        private readonly FacturaService _facturaService;
-
-        public FacturaController(FacturaService facturaService)
-        {
-            _facturaService = facturaService;
-        }
+        private readonly FacturaService _facturaService = facturaService;
 
         [HttpPost]
-        [Route("add")]
+        [Route("AgregarFactura")]
         public async Task<IActionResult> Add(FacturaDTO factura)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 if (await _facturaService.Add(factura))
                     return Ok("Factura agregada correctamente");
                 else
-                    return BadRequest("Error al agregar Factura");
+                    return BadRequest($"No existe el cliente con id {factura.IdCliente}");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Ups, ha ocurrido un error al agregar la factura");
             }
         }
 
         [HttpPut]
-        [Route("update")]
+        [Route("ActualizarFactura")]
         public async Task<IActionResult> Update(FacturaDTO factura)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 if (await _facturaService.Update(factura))
                     return Ok("Factura actualizada correctamente");
                 else
-                    return BadRequest("Error al actualizar Factura");
+                    return BadRequest($"No existe el cliente con id {factura.IdCliente}");
             }
             catch (Exception ex)
             {
@@ -52,7 +55,7 @@ namespace api.optativov.persona.Controllers
         }
 
         [HttpDelete]
-        [Route("remove/{id}")]
+        [Route("EliminarFactura/{id}")]
         public async Task<IActionResult> Remove(int id)
         {
             try
@@ -69,7 +72,7 @@ namespace api.optativov.persona.Controllers
         }
 
         [HttpGet]
-        [Route("get/{id}")]
+        [Route("ObtenerFactura/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -87,7 +90,7 @@ namespace api.optativov.persona.Controllers
         }
 
         [HttpGet]
-        [Route("list")]
+        [Route("ListarFactura")]
         public async Task<IActionResult> List()
         {
             try
