@@ -211,7 +211,10 @@ Aquí se muestra una captura de pantalla de un error de validación.
 Aquí se muestra una captura de pantalla de una respuesta exitosa.
 
 ![image](https://github.com/rbarros01/api.optativo5.tareas/assets/146038996/d870c255-0934-4332-bff3-1258eaf71b1e)
-
+![image](https://github.com/rbarros01/api.optativo5.tareas/assets/146038996/e1eed81e-5e3e-4fb3-a126-fb2a4a168b35)
+![image](https://github.com/rbarros01/api.optativo5.tareas/assets/146038996/eec988ae-3f1b-4e5d-a137-c4b31c223d73)
+![image](https://github.com/rbarros01/api.optativo5.tareas/assets/146038996/870c73e4-8a39-482f-8bfa-10671d42c5c8)
+![image](https://github.com/rbarros01/api.optativo5.tareas/assets/146038996/d3aa233f-fb1a-4a4b-8093-402989350820)
 
 ### Respuesta 400
 
